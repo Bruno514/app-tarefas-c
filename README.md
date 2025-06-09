@@ -1,2 +1,2 @@
 # app-tarefas-c
-Programa para gerenciar tarefas pessoais em C
+Programa para **gerenciar** tarefas pessoais em C
