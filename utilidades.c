@@ -69,5 +69,11 @@ int validar_data(char *data) {
         return 0;
     }
 
+    int dias_limite_por_mes[12] = {31, 30, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    if (dia > dias_limite_por_mes[mes - 1]) {
+        return 0;
+    }
+
     return 1;
 }
