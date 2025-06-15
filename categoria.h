@@ -12,14 +12,12 @@ typedef struct Categoria {
     char descricao[MAX_DESCRICAO];
 }categoria;
 
-typedef categoria *p_categoria;
-
-extern p_categoria categorias[];
+extern categoria *categorias[MAX_CATEGORIAS];
 
 // categorizar tarefas (trabalho, escola, saúde, casa, lazer, mercado), opção de adiconar/remover uma categoria, avisar 2 dias em antes ao rodar o programa, persistencia em arquivos
 
-void adicionarCategoria();
+void adicionar_categoria();
 
-void removerCategoria();
+void remover_categoria();
 
 #endif //CATEGORIA_H

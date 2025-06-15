@@ -16,37 +16,35 @@
 typedef struct Tarefa{
     int id;
     char descricao[MAX_DESCRICAO];
-    time_t data_limite;
-    int prioridade; // Perf
+    char data_limite[9];
+    int prioridade;
     int status;
     categoria categoria;
 }tarefa;
 
-typedef tarefa *p_tarefa;
-
-extern p_tarefa tarefas[MAX_TAREFAS];
+extern tarefa *tarefas[MAX_TAREFAS];
 
 // Adicionar, remover, marcar como concluido, alterar, buscar por palavra chave, listar pendentes ordernados por prioridade e data,
 // persistencia em arquivo,
 
-void inicializarTarefas();
+void inicializar_tarefas();
 
-void salvarTarefas();
+void salvar_tarefas();
 
-void adicionarTarefa();
+void adicionar_tarefa();
 
-void alterarTarefa();
+void alterar_tarefa();
 
-void removerTarefa();
+void remover_tarefa();
 
-void fazerConclusao();
+void fazer_conclusao();
 
-void desfazerConclusao();
+void desfazer_conclusao();
 
-void listarPendentes(int desc);
+void listar_pendentes(int desc);
 
-void avisarSobrePrazo();
+void avisar_prazo();
 
-void buscarTarefa();
+void buscar_tarefa();
 
 #endif //TAREFA_H

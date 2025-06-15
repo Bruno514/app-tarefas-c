@@ -7,4 +7,6 @@ add_executable(app_tarefas app.c
         tarefa.c
         tarefa.h
         categoria.c
-        categoria.h)
+        categoria.h
+        utilidades.c
+        utilidades.h)

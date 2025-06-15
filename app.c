@@ -4,13 +4,10 @@
 
 #include "tarefa.h"
 #include "categoria.h"
-
-
+#include "utilidades.h"
 
 int main(void) {
-    struct 
-
-    printf("Hello");
+    adicionar_tarefa();
 
     return 0;
 }
