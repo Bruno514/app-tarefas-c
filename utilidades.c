@@ -23,16 +23,20 @@ void limpar_buffer_entrada() {
     while ((c = getchar()) != '\n' && c != EOF) { }
 }
 
-void ler_string(char *string) {
-    fgets(string, sizeof(string) + 1, stdin);
-    string[strcspn(string, "\n")] = '\0';
-    limpar_buffer_entrada();
+void ler_string(char string[], int tamanho) {
+    fgets(string, tamanho, stdin);
+    size_t len = strlen(string);
+
+    if (len > 0 && string[len-1] == '\n') {
+        string[len-1] = '\0';
+    } else {
+        limpar_buffer_entrada();
+    }
 }
 
 int validar_data(char *data) {
     // Checa pelos separadores da data
     if (data[2] != '/' && data[5] != '/') {
-        printf("separ");
         return 0;
     }
 

@@ -5,7 +5,7 @@
 #ifndef UTILIDADES_H
 #define UTILIDADES_H
 
-void ler_string(char *string);
+void ler_string(char string[], int tamanho);
 
 void limpar_buffer_entrada();
 
