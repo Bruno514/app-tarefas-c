@@ -11,15 +11,16 @@
 
 #define MAX_TAREFAS 10000
 
-#define MAX_DESCRICAO 81
+#define MAX_T_DESCRICAO 81
+#define MAX_T_DATA 9
 
 typedef struct Tarefa{
     int id;
-    char descricao[MAX_DESCRICAO];
-    char data_limite[9];
+    char descricao[MAX_T_DESCRICAO];
+    char data_limite[MAX_T_DATA];
     int prioridade;
     int status;
-    categoria categoria;
+    categoria *categoria;
 }tarefa;
 
 extern tarefa *tarefas[MAX_TAREFAS];
