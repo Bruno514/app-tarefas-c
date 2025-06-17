@@ -11,6 +11,7 @@
 
 
 tarefa *tarefas[MAX_TAREFAS];
+int contador_id = 0;
 
 void inicializar_tarefas() {
     for (int i = 0; i < MAX_TAREFAS; i++) {
@@ -30,6 +31,8 @@ void adicionar_tarefa() {
     }
 
     tarefa *tarefa = malloc(sizeof(tarefa));
+
+    tarefa->id = contador_id++;
 
     printf("Informe a descrição da tarefa: ");
     ler_string(tarefa->descricao, MAX_T_DESCRICAO);

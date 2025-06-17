@@ -23,6 +23,7 @@ typedef struct Tarefa{
 }tarefa;
 
 extern tarefa *tarefas[MAX_TAREFAS];
+extern int contador_id;
 
 // Adicionar, remover, marcar como concluido, alterar, buscar por palavra chave, listar pendentes ordernados por prioridade e data,
 // persistencia em arquivo,
