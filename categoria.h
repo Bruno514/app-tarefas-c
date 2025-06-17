@@ -20,7 +20,7 @@ void inicializar_categorias();
 
 void adicionar_categoria();
 
-void listar_categorias();
+int listar_categorias();
 
 void remover_categoria();
 

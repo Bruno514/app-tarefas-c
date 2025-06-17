@@ -6,7 +6,6 @@
 #ifndef TAREFA_H
 #define TAREFA_H
 
-#include <time.h>
 #include "categoria.h"
 
 #define MAX_TAREFAS 10000

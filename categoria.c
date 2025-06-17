@@ -27,7 +27,7 @@ void adicionar_categoria() {
         }
     }
 
-    categoria *categoria= malloc(sizeof(categoria));
+    categoria *categoria = malloc(sizeof(categoria));
 
     printf("Informe a descrição da categoria: ");
     ler_string(categoria->descricao, MAX_C_DESCRICAO);
@@ -35,21 +35,22 @@ void adicionar_categoria() {
     if (posicao != -1) {
         categorias[posicao] = categoria;
 
-        printf("Categoria adicionada com sucesso!\n");
+        printf("Categoria adicionada com sucesso!\n\n");
     } else {
-        printf("Não há espaço para mais categorias\n");
+        printf("Não há espaço para mais categorias\n\n");
     }
 }
 
 void remover_categoria() {
 }
 
-void listar_categorias() {
+int listar_categorias() {
     printf("Categorias disponíveis: \n\n");
     for (int j = 0; j < MAX_CATEGORIAS; j++) {
         if (categorias[j] == NULL) {
             if (j == 0) {
                 printf("Não há categorias\n");
+                return 0;
             }
 
             break;
@@ -59,9 +60,11 @@ void listar_categorias() {
         puts(categorias[j]->descricao);
         printf("\n");
     }
+
+    return 1;
 }
 
-categoria* selecionar_categoria(int index) {
+categoria *selecionar_categoria(int index) {
     for (int j = 0; j < MAX_CATEGORIAS; j++) {
         if (categorias[j] == NULL) {
             return NULL;
