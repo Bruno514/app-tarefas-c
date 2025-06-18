@@ -81,3 +81,8 @@ int validar_data(char *data) {
 
     return 1;
 }
+
+void esperar_para_continuar() {
+    printf("\nContinuar...");
+    getchar();
+}

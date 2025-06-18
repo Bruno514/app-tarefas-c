@@ -39,9 +39,13 @@ void adicionar_categoria() {
     } else {
         printf("Não há espaço para mais categorias\n\n");
     }
+
+    esperar_para_continuar();
 }
 
 void remover_categoria() {
+    printf("Continuar...\n");
+    getchar();
 }
 
 int listar_categorias() {
@@ -60,6 +64,8 @@ int listar_categorias() {
         puts(categorias[j]->descricao);
         printf("\n");
     }
+
+    esperar_para_continuar();
 
     return 1;
 }

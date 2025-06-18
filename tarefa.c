@@ -71,6 +71,7 @@ void adicionar_tarefa() {
 
     printf("Adicionar categoria? (s\\n): ");
     escolha = (char) getchar();
+    limpar_buffer_entrada();
 
     if (escolha == 's' || escolha == 'S') {
         int categoria_index;
@@ -102,6 +103,60 @@ void adicionar_tarefa() {
     }
 
     tarefa->status = 0;
+    printf("\nTarefa adicionada com sucesso\n");
 
     tarefas[posicao] = tarefa;
+
+    esperar_para_continuar();
+}
+
+void remover_tarefa() {
+    int id;
+    int removeu = 0;
+
+    printf("Digite o ID da tarefa que deseja remover: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) {
+            continue;
+        }
+
+        if (tarefas[i]->id == id) {
+            tarefas[i] = NULL;
+            removeu = 1;
+            break;
+        }
+    }
+
+    if (!removeu) {
+        printf("Tarefa não foi encontrada\n\n");
+    }
+
+    esperar_para_continuar();
+}
+
+void listar_tarefas(int listar_concluidas) {
+    int tem_tarefas = 0;
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) {
+            continue;
+        }
+        if (!listar_concluidas && tarefas[i]->status == 1) {
+            continue;
+        }
+
+        tem_tarefas = 1;
+        printf("ID %d - ", tarefas[i]->id);
+        puts(tarefas[i]->descricao);
+        printf("Prioridade: %d\n", tarefas[i]->prioridade);
+        printf("Prazo para %s\n", tarefas[i]->data_limite);
+        printf("Status: %s\n\n", tarefas[i]->status == 1 ? "Concluída" : "Não concluída");
+    }
+
+    if (!tem_tarefas) {
+        printf("Nenhuma tarefa encontrada\n\n");
+    }
+
+    esperar_para_continuar();
 }

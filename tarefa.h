@@ -42,7 +42,9 @@ void fazer_conclusao();
 
 void desfazer_conclusao();
 
-void listar_pendentes(int desc);
+void listar_tarefas(int listar_concluidas);
+
+void listar_pendentes(int listar_ordem_desc);
 
 void avisar_prazo();
 

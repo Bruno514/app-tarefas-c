@@ -9,4 +9,5 @@ add_executable(app_tarefas app.c
         categoria.c
         categoria.h
         utilidades.c
-        utilidades.h)
+        utilidades.h
+        app.h)
