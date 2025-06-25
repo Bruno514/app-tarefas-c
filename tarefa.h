@@ -6,17 +6,17 @@
 #ifndef TAREFA_H
 #define TAREFA_H
 
+#include <time.h>
 #include "categoria.h"
 
 #define MAX_TAREFAS 10000
 
 #define MAX_T_DESCRICAO 81
-#define MAX_T_DATA 9
 
 typedef struct Tarefa{
     int id;
     char descricao[MAX_T_DESCRICAO];
-    char data_limite[MAX_T_DATA];
+    struct tm data_limite;
     int prioridade;
     int status;
     categoria *categoria;
@@ -34,17 +34,13 @@ void salvar_tarefas();
 
 void adicionar_tarefa();
 
-void alterar_tarefa();
-
 void remover_tarefa();
 
 void fazer_conclusao();
 
 void desfazer_conclusao();
 
-void listar_tarefas(int listar_concluidas);
-
-void listar_pendentes(int listar_ordem_desc);
+void listar_tarefas();
 
 void avisar_prazo();
 

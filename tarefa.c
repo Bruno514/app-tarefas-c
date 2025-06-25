@@ -4,8 +4,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "tarefa.h"
+
+#include <string.h>
+
 #include "categoria.h"
 #include "utilidades.h"
 
@@ -22,6 +26,7 @@ void inicializar_tarefas() {
 
 void adicionar_tarefa() {
     int posicao = -1;
+    char data_limite_string[10];
 
     for (int i = 0; i < MAX_TAREFAS; i++) {
         if (tarefas[i] == NULL) {
@@ -37,16 +42,13 @@ void adicionar_tarefa() {
     printf("Informe a descrição da tarefa: ");
     ler_string(tarefa->descricao, MAX_T_DESCRICAO);
 
-    printf("Informe a data limite da tarefa (dd/mm/aa): ");
-    ler_string(tarefa->data_limite, MAX_T_DATA);
+    printf("Informe a data limite da tarefa (aaaa/mm/dd): ");
+    ler_string(data_limite_string, 11);
+
+    memset(&tarefa->data_limite, 0, sizeof(tarefa->data_limite));
+    str_data_para_tm(data_limite_string, &tarefa->data_limite);
 
     printf("\n");
-
-    while (!validar_data(tarefa->data_limite)) {
-        printf("Data limite invalida!\n");
-        printf("Informe a data limite da tarefa (dd/mm/aa): ");
-        ler_string(tarefa->data_limite, MAX_T_DATA);
-    }
 
     printf("Prioridade padrão eh 5\n\n");
     printf("Escolher prioridade para a tarefa? (s\\n): ");
@@ -136,13 +138,21 @@ void remover_tarefa() {
     esperar_para_continuar();
 }
 
-void listar_tarefas(int listar_concluidas) {
+void listar_tarefas() {
     int tem_tarefas = 0;
+    int opcao = 1;
+
+    printf("1 - Ordem decrescente (prioridade)\n");
+    printf("2 - Ordem decrescente (data)\n");
+    printf("3 - Ordem crescente (prioridade)\n");
+    printf("4 - Ordem crescente (data)\n\n");
+
+    printf("Como deseja listar? ");
+    scanf("%d", &opcao);
+    limpar_buffer_entrada();
+
     for (int i = 0; i < MAX_TAREFAS; i++) {
         if (tarefas[i] == NULL) {
-            continue;
-        }
-        if (!listar_concluidas && tarefas[i]->status == 1) {
             continue;
         }
 
@@ -150,7 +160,7 @@ void listar_tarefas(int listar_concluidas) {
         printf("ID %d - ", tarefas[i]->id);
         puts(tarefas[i]->descricao);
         printf("Prioridade: %d\n", tarefas[i]->prioridade);
-        printf("Prazo para %s\n", tarefas[i]->data_limite);
+        printf("Prazo para %d/%d/%d\n", tarefas[i]->data_limite.tm_year + 1900, tarefas[i]->data_limite.tm_mon + 1, tarefas[i]->data_limite.tm_mday);
         printf("Status: %s\n\n", tarefas[i]->status == 1 ? "Concluída" : "Não concluída");
     }
 

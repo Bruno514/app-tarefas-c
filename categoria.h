@@ -18,6 +18,8 @@ extern categoria *categorias[MAX_CATEGORIAS];
 
 void inicializar_categorias();
 
+void salvar_categorias();
+
 void adicionar_categoria();
 
 int listar_categorias();

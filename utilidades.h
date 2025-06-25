@@ -17,6 +17,6 @@ void limpar_buffer_entrada();
 
 void esperar_para_continuar();
 
-int validar_data(char *data);
+int str_data_para_tm(char *data, struct tm *tm_data);
 
 #endif //UTILIDADES_H
