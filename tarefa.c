@@ -46,7 +46,12 @@ void adicionar_tarefa() {
     ler_string(data_limite_string, 11);
 
     memset(&tarefa->data_limite, 0, sizeof(tarefa->data_limite));
-    str_data_para_tm(data_limite_string, &tarefa->data_limite);
+
+    while (!str_data_para_tm(data_limite_string, &tarefa->data_limite)) {
+        printf("\nData inválida\n");
+        printf("Informe a data limite da tarefa (aaaa/mm/dd): ");
+        ler_string(data_limite_string, 11);
+    }
 
     printf("\n");
 
