@@ -7,14 +7,38 @@
 
 #include <stdio.h>
 #include <strings.h>
+#include <string.h>
 #include <stdlib.h>
 
 categoria *categorias[MAX_CATEGORIAS];
 
+int c_ultimo_id = 0;
+
 void inicializar_categorias() {
-    for (int i = 0; i < MAX_CATEGORIAS; i++) {
-        categorias[i] = NULL;
+    FILE *stream = fopen("/home/bruno/categorias.csv", "a+");
+
+    char linha[256];
+    int categorias_contador = 1;
+
+    while (fgets(linha,256, stream) != NULL) {
+        categoria *categoria = malloc(sizeof(categoria));
+
+        categoria->id = atoi(strtok(linha, ","));
+        if (categoria->id >c_ultimo_id) {
+            c_ultimo_id = categoria->id;
+        }
+
+        strcpy(categoria->descricao, strtok(NULL, ","));
+        strtok(NULL, ",");
+
+        categorias[categorias_contador++] = categoria;
     }
+
+    for (; categorias_contador < MAX_CATEGORIAS; categorias_contador++) {
+        categorias[categorias_contador] = NULL;
+    }
+
+    fclose(stream);
 }
 
 void adicionar_categoria() {
@@ -28,6 +52,8 @@ void adicionar_categoria() {
     }
 
     categoria *categoria = malloc(sizeof(categoria));
+
+    categoria->id = ++c_ultimo_id;
 
     printf("Informe a descrição da categoria: ");
     ler_string(categoria->descricao, MAX_C_DESCRICAO);
@@ -44,25 +70,50 @@ void adicionar_categoria() {
 }
 
 void remover_categoria() {
-    printf("Continuar...\n");
-    getchar();
+    int id;
+    int removeu = 0;
+
+    printf("Digite o numero da categoria que deseja remover: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < MAX_CATEGORIAS; i++) {
+        if (categorias[i] == NULL) {
+            continue;
+        }
+
+        if (i + 1 == id) {
+            categorias[i] = NULL;
+            removeu = 1;
+            break;
+        }
+    }
+
+    if (!removeu) {
+        printf("Categoria não foi encontrada\n\n");
+    }
+
+    esperar_para_continuar();
 }
 
 int listar_categorias() {
+    int tem_categorias = 0;
+
     printf("Categorias disponíveis: \n\n");
+
     for (int j = 0; j < MAX_CATEGORIAS; j++) {
         if (categorias[j] == NULL) {
-            if (j == 0) {
-                printf("Não há categorias\n");
-                return 0;
-            }
-
-            break;
+            continue;
         }
 
-        printf("%d - ", j + 1);
+        tem_categorias = 1;
+
+        printf("%d - ", categorias[j]->id);
         puts(categorias[j]->descricao);
         printf("\n");
+    }
+
+    if (!tem_categorias) {
+        printf("Não há categorias\n");
     }
 
     esperar_para_continuar();
@@ -70,12 +121,13 @@ int listar_categorias() {
     return 1;
 }
 
-categoria *selecionar_categoria(int index) {
+categoria *selecionar_categoria(int id) {
     for (int j = 0; j < MAX_CATEGORIAS; j++) {
         if (categorias[j] == NULL) {
-            return NULL;
+            continue;
         }
-        if (index == j) {
+
+        if (id == categorias[j]->id) {
             return categorias[j];
         }
     }

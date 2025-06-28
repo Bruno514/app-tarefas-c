@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 
 #include "tarefa.h"
@@ -15,13 +16,37 @@
 
 
 tarefa *tarefas[MAX_TAREFAS];
-int contador_id = 0;
+int t_ultimo_id = 0;
 
 void inicializar_tarefas() {
-    for (int i = 0; i < MAX_TAREFAS; i++) {
-        tarefas[i] = NULL;
-        break;
+    FILE *stream = fopen("/home/bruno/tarefas.csv", "a+");
+
+    char linha[256];
+    int tarefas_contador = 0;
+
+    while (fgets(linha, 256, stream) != NULL) {
+        tarefa *tarefa = malloc(sizeof(tarefa));
+
+        tarefa->id = atoi(strtok(linha, ","));
+        if (tarefa->id > t_ultimo_id) {
+            t_ultimo_id = tarefa->id;
+        }
+
+        strcpy(tarefa->descricao, strtok(NULL, ","));
+        str_data_para_tm(strtok(NULL, ","), &tarefa->data_limite);
+        tarefa->prioridade = atoi(strtok(NULL, ","));
+        tarefa->status = atoi(strtok(NULL, ","));
+        tarefa->categoria = selecionar_categoria(atoi(strtok(NULL, ",")));
+        strtok(NULL, ",");
+
+        tarefas[tarefas_contador++] = tarefa;
     }
+
+    for (; tarefas_contador < MAX_TAREFAS; tarefas_contador++) {
+        tarefas[tarefas_contador] = NULL;
+    }
+
+    fclose(stream);
 }
 
 void adicionar_tarefa() {
@@ -37,7 +62,7 @@ void adicionar_tarefa() {
 
     tarefa *tarefa = malloc(sizeof(tarefa));
 
-    tarefa->id = contador_id++;
+    tarefa->id = ++t_ultimo_id;
 
     printf("Informe a descrição da tarefa: ");
     ler_string(tarefa->descricao, MAX_T_DESCRICAO);
@@ -165,8 +190,13 @@ void listar_tarefas() {
         printf("ID %d - ", tarefas[i]->id);
         puts(tarefas[i]->descricao);
         printf("Prioridade: %d\n", tarefas[i]->prioridade);
-        printf("Prazo para %d/%d/%d\n", tarefas[i]->data_limite.tm_year + 1900, tarefas[i]->data_limite.tm_mon + 1, tarefas[i]->data_limite.tm_mday);
-        printf("Status: %s\n\n", tarefas[i]->status == 1 ? "Concluída" : "Não concluída");
+        printf("Prazo para %d/%d/%d\n", tarefas[i]->data_limite.tm_year + 1900, tarefas[i]->data_limite.tm_mon + 1,
+               tarefas[i]->data_limite.tm_mday);
+        printf("Status: %s\n", tarefas[i]->status == 1 ? "Concluída" : "Não concluída");
+        if (tarefas[i]->categoria != NULL) {
+            printf("Categoria: ");
+            puts(tarefas[i]->categoria->descricao);
+        }
     }
 
     if (!tem_tarefas) {
@@ -174,4 +204,24 @@ void listar_tarefas() {
     }
 
     esperar_para_continuar();
+}
+
+void ordernar_tarefas_por_prioridade() {
+    bool trocado;
+    for (int i = 0; i < MAX_TAREFAS - 1; i++) {
+        trocado = false;
+        for (int j = 0; j < MAX_TAREFAS - i - 1; j++) {
+            if (tarefas[j]->prioridade > tarefas[j + 1]->prioridade || tarefas[j] == NULL) {
+                tarefa *temporario = tarefas[j];
+                tarefas[j] = tarefas[j + 1];
+                tarefas[j + 1] = temporario;
+                trocado = true;
+            }
+        }
+
+        // If no two elements were swapped by inner loop,
+        // then break
+        if (trocado == false)
+            break;
+    }
 }

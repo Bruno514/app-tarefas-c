@@ -5,9 +5,17 @@
 #include "categoria.h"
 #include "utilidades.h"
 
+#define LIS_TAREFA 1
+#define ADC_TAREFA 2
+#define REM_TAREFA 3
+#define LIS_CATEGORIA 4
+#define ADC_CATEGORIA 5
+#define REM_CATEGORIA 6
+#define SAIR 0
+
 int main(void) {
-    inicializar_tarefas();
     inicializar_categorias();
+    inicializar_tarefas();
 
     int opcao = -1;
 
@@ -20,19 +28,28 @@ int main(void) {
 
         printf("\n");
         switch (opcao) {
-            case 1:
+            case LIS_TAREFA:
+                clrscr();
                 listar_tarefas(1);
                 break;
-            case 2:
+            case ADC_TAREFA:
+                clrscr();
                 adicionar_tarefa();
                 break;
-            case 3:
+            case REM_TAREFA:
+                clrscr();
                 remover_tarefa();
                 break;
-            case 4:
+            case LIS_CATEGORIA:
+                clrscr();
+                listar_categorias();
+                break;
+            case ADC_CATEGORIA:
+                clrscr();
                 adicionar_categoria();
                 break;
-            case 5:
+            case REM_CATEGORIA:
+                clrscr();
                 remover_categoria();
                 break;
             default:
@@ -50,6 +67,8 @@ void mostrar_menu() {
     printf("1 - Listar tarefas\n");
     printf("2 - Adicionar tarefa\n");
     printf("3 - Remover tarefa\n");
-    printf("4 - Adicionar categoria\n\n");
+    printf("4 - Listar categorias\n");
+    printf("5 - Adicionar categoria\n");
+    printf("6 - Remover categoria\n\n");
     printf("0 - Sair\n\n");
 }

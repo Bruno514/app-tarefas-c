@@ -9,6 +9,7 @@
 #define MAX_C_DESCRICAO 41
 
 typedef struct Categoria {
+    int id;
     char descricao[MAX_C_DESCRICAO];
 }categoria;
 
@@ -26,6 +27,6 @@ int listar_categorias();
 
 void remover_categoria();
 
-categoria* selecionar_categoria();
+categoria* selecionar_categoria(int id);
 
 #endif //CATEGORIA_H
