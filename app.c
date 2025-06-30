@@ -684,7 +684,7 @@ void m_ver_tarefas_concluidas() {
             }
         }
         fputs(tarefa->descricao, stdout);
-        printf("OK)", tarefa->id);
+        printf(" (OK)");
         if (data->tm_year != -1) {
             printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
         }
