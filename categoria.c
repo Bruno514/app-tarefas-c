@@ -14,36 +14,48 @@ categoria *categorias[MAX_CATEGORIAS];
 
 int c_ultimo_id = 0;
 
-void inicializar_categorias() {
+bool inicializar_categorias() {
     FILE *stream = fopen("/home/bruno/categorias.csv", "a+");
 
     char linha[256];
-    int categorias_contador = 1;
+    int id = 0;
+    char descricao[MAX_C_DESCRICAO];
 
     while (fgets(linha,256, stream) != NULL) {
-        categoria *categoria = malloc(sizeof(categoria));
-
-        categoria->id = atoi(strtok(linha, ","));
-        if (categoria->id >c_ultimo_id) {
-            c_ultimo_id = categoria->id;
+        id = atoi(strtok(linha, ","));
+        if (id > c_ultimo_id) {
+            c_ultimo_id = id;
         }
 
-        strcpy(categoria->descricao, strtok(NULL, ","));
+        strcpy(descricao, strtok(NULL, ","));
+        descricao[strlen(descricao)-1] = '\0';
         strtok(NULL, ",");
 
-        categorias[categorias_contador++] = categoria;
+        categoria *categoria = criar_categoria(id, descricao);
+        adicionar_categoria(categoria);
     }
 
-    for (; categorias_contador < MAX_CATEGORIAS; categorias_contador++) {
-        categorias[categorias_contador] = NULL;
+    for (int i = 0; i < MAX_CATEGORIAS; i++) {
+        if (categorias[i] != NULL) continue;
+        categorias[i] = NULL;
     }
 
     fclose(stream);
+
+    return true;
 }
 
-void adicionar_categoria() {
-    int posicao = -1;
+categoria* criar_categoria(int id, char *descricao) {
+    categoria *categoria = malloc(sizeof(categoria));
 
+    categoria->id = id == -1 ? ++c_ultimo_id : id;
+    strcpy(categoria->descricao, descricao);
+
+    return categoria;
+}
+
+bool adicionar_categoria(categoria *categoria) {
+    int posicao = -1;
     for (int i = 0; i < MAX_CATEGORIAS; i++) {
         if (categorias[i] == NULL) {
             posicao = i;
@@ -51,37 +63,22 @@ void adicionar_categoria() {
         }
     }
 
-    categoria *categoria = malloc(sizeof(categoria));
+    if  (posicao == -1) return false;
 
-    categoria->id = ++c_ultimo_id;
+    categorias[posicao] = categoria;
 
-    printf("Informe a descrição da categoria: ");
-    ler_string(categoria->descricao, MAX_C_DESCRICAO);
-
-    if (posicao != -1) {
-        categorias[posicao] = categoria;
-
-        printf("Categoria adicionada com sucesso!\n\n");
-    } else {
-        printf("Não há espaço para mais categorias\n\n");
-    }
-
-    esperar_para_continuar();
+    return true;
 }
 
-void remover_categoria() {
-    int id;
+bool remover_categoria(int id) {
     int removeu = 0;
-
-    printf("Digite o numero da categoria que deseja remover: ");
-    scanf("%d", &id);
 
     for (int i = 0; i < MAX_CATEGORIAS; i++) {
         if (categorias[i] == NULL) {
             continue;
         }
 
-        if (i + 1 == id) {
+        if (categorias[i]->id == id) {
             categorias[i] = NULL;
             removeu = 1;
             break;
@@ -89,36 +86,10 @@ void remover_categoria() {
     }
 
     if (!removeu) {
-        printf("Categoria não foi encontrada\n\n");
+        return false;
     }
 
-    esperar_para_continuar();
-}
-
-int listar_categorias() {
-    int tem_categorias = 0;
-
-    printf("Categorias disponíveis: \n\n");
-
-    for (int j = 0; j < MAX_CATEGORIAS; j++) {
-        if (categorias[j] == NULL) {
-            continue;
-        }
-
-        tem_categorias = 1;
-
-        printf("%d - ", categorias[j]->id);
-        puts(categorias[j]->descricao);
-        printf("\n");
-    }
-
-    if (!tem_categorias) {
-        printf("Não há categorias\n");
-    }
-
-    esperar_para_continuar();
-
-    return 1;
+    return true;
 }
 
 categoria *selecionar_categoria(int id) {

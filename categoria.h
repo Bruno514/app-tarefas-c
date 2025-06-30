@@ -5,6 +5,8 @@
 #ifndef CATEGORIA_H
 #define CATEGORIA_H
 
+#include <stdbool.h>
+
 #define MAX_CATEGORIAS 100
 #define MAX_C_DESCRICAO 41
 
@@ -14,18 +16,19 @@ typedef struct Categoria {
 }categoria;
 
 extern categoria *categorias[MAX_CATEGORIAS];
+extern int c_ultimo_id;
 
 // categorizar tarefas (trabalho, escola, saúde, casa, lazer, mercado), opção de adiconar/remover uma categoria, avisar 2 dias em antes ao rodar o programa, persistencia em arquivos
 
-void inicializar_categorias();
+bool inicializar_categorias();
 
-void salvar_categorias();
+bool salvar_categorias();
 
-void adicionar_categoria();
+categoria* criar_categoria(int id, char *descricao);
 
-int listar_categorias();
+bool adicionar_categoria(categoria *categoria);
 
-void remover_categoria();
+bool remover_categoria(int id);
 
 categoria* selecionar_categoria(int id);
 

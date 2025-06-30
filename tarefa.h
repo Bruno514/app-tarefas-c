@@ -7,23 +7,25 @@
 #define TAREFA_H
 
 #include <time.h>
+#include <stdbool.h>
+
 #include "categoria.h"
 
 #define MAX_TAREFAS 10000
 
 #define MAX_T_DESCRICAO 81
 
-typedef struct Tarefa{
+typedef struct Tarefa {
     int id;
     char descricao[MAX_T_DESCRICAO];
     struct tm data_limite;
     int prioridade;
     int status;
     categoria *categoria;
-}tarefa;
+} tarefa;
 
 extern tarefa *tarefas[MAX_TAREFAS];
-extern int contador_id;
+extern int t_ultimo_id;
 
 // Adicionar, remover, marcar como concluido, alterar, buscar por palavra chave, listar pendentes ordernados por prioridade e data,
 // persistencia em arquivo,
@@ -32,18 +34,23 @@ void inicializar_tarefas();
 
 void salvar_tarefas();
 
-void adicionar_tarefa();
+tarefa *criar_tarefa(int id, char *descricao, char *data_limite, int status, int prioridade,
+                     categoria *categoria);
 
-void remover_tarefa();
+bool adicionar_tarefa(tarefa *tarefa);
 
-void fazer_conclusao();
+bool alterar_prazo(tarefa *tarefa, char data_limite[10]);
 
-void desfazer_conclusao();
+bool alterar_categoria(tarefa *tarefa, int id_categoria);
 
-void listar_tarefas();
+bool remover_tarefa(int id);
 
-void avisar_prazo();
+tarefa *buscar_tarefa_id(int id);
 
-void buscar_tarefa();
+tarefa *buscar_tarefa_palavra(char *busca);
+
+bool ordernar_por_prioridade(bool decrescente);
+
+bool ordernar_por_data(bool decrescente);
 
 #endif //TAREFA_H
