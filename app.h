@@ -36,6 +36,8 @@ void m_alterar_prazo();
 
 void m_salvar_e_sair();
 
+void m_notificar();
+
 // Retorna frase baseado no Int do tipo de ordem
 char *_obter_frase_ordenacao_atual();
 

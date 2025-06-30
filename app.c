@@ -3,7 +3,7 @@
 
 #include "app.h"
 
-#include <iso646.h>
+#include <stdlib.h>
 
 #include "tarefa.h"
 #include "categoria.h"
@@ -107,6 +107,7 @@ void m_mostrar_tarefas() {
     printf("===============================\n\n");
     printf("Categorias:\n");
     categoria *categoria_selecionada = selecionar_categoria(id_categoria_selecionada);
+    m_notificar();
 
     for (int i = 0; i < MAX_CATEGORIAS; i++) {
         if (categorias[i] == NULL) {
@@ -136,6 +137,11 @@ void m_mostrar_tarefas() {
     printf("\n\n");
     printf("Atualmente visualizando: ");
     puts(categoria_selecionada == NULL ? "Todas" : categoria_selecionada->descricao);
+    printf("Ordenação atual: ");
+    puts(_obter_frase_ordenacao_atual());
+    printf("\n");
+
+    printf("\n");
     if (categoria_selecionada != NULL) {
         printf("Tarefas em ");
         puts(categoria_selecionada->descricao);
@@ -741,10 +747,68 @@ void m_ordernar() {
 }
 
 void m_alterar_prazo() {
-
 }
 
 void m_salvar_e_sair() {
+}
+
+void m_notificar() {
+    int quantidade_notificacoes = 0;
+
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) continue;
+        if (tarefas[i]->status == 1) continue;
+
+        tarefa *tarefa = tarefas[i];
+        // struct tm data = tarefa->data_limite;
+
+        time_t rawtime;
+        time(&rawtime);
+        struct tm * tm_now = localtime(&rawtime);
+
+        // Tarefas atrasadas ou 2 dias faltando para o prazo contam como notificadas
+        if (tm_now->tm_year == tarefa->data_limite.tm_year && tm_now->tm_mon == tarefa->data_limite.tm_mon) {
+            if (tm_now->tm_mday - tarefa->data_limite.tm_mday < 2) {
+                quantidade_notificacoes++;
+            }
+        }
+    }
+
+    printf("NOTIFICAÇÕES (%d):\n", quantidade_notificacoes);
+
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) continue;
+        if (tarefas[i]->status == 1) continue;
+
+        tarefa *tarefa = tarefas[i];
+        struct tm *data = &tarefa->data_limite;
+
+        time_t t = time(NULL);
+        struct tm time = *localtime(&t);
+
+        // Tarefas atrasadas ou 2 dias faltando para o prazo contam como notificadas
+        if (time.tm_year == data->tm_year && time.tm_mon == data->tm_mon) {
+            if (time.tm_mday - data->tm_mday < 2) {
+                int dias_atraso = time.tm_mday - data->tm_mday;
+
+                printf("  [P%d] ", tarefa->prioridade);
+                if (tarefa->categoria != NULL) {
+                    printf("[");
+                    fputs(tarefa->categoria->descricao, stdout);
+                    printf("] ");
+                }
+                fputs(tarefa->descricao, stdout);
+                printf(" (ID %d)", tarefa->id);
+                printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+                if (dias_atraso > 0) {
+                    // printf(" | Atrasado %d dias\n", abs(dias_atraso));
+                } else {
+                    printf(" | Faltam %d dias\n", dias_atraso);
+                }
+            }
+        }
+    }
+    printf("\n");
 }
 
 char *_obter_frase_ordenacao_atual() {
