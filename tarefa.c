@@ -81,7 +81,7 @@ void salvar_tarefas() {
 }
 
 tarefa *criar_tarefa(int id, char *descricao, char *data_limite, int status, int prioridade, categoria *categoria) {
-    tarefa *tarefa = malloc(sizeof(tarefa));
+    tarefa *tarefa = malloc(sizeof(*tarefa));
 
     // ID pode ser informado ou não (nesse caso um id será dado automaticamente)
     tarefa->id = id == -1 ? ++t_ultimo_id : id;
