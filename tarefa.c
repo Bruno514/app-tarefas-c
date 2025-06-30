@@ -162,14 +162,32 @@ bool ordernar_por_prioridade(bool decrescente) {
         trocado = false;
         for (int j = 0; j < MAX_TAREFAS - i - 1; j++) {
             if (!decrescente) {
-                if (tarefas[j]->prioridade > tarefas[j + 1]->prioridade || tarefas[j] == NULL) {
+                if (tarefas[j] == NULL && tarefas[j + 1] != NULL) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
+                if (tarefas[j + 1] == NULL) continue;
+
+                if (tarefas[j]->prioridade > tarefas[j + 1]->prioridade) {
                     tarefa *temporario = tarefas[j];
                     tarefas[j] = tarefas[j + 1];
                     tarefas[j + 1] = temporario;
                     trocado = true;
                 }
             } else {
-                if (tarefas[j]->prioridade < tarefas[j + 1]->prioridade || tarefas[j + 1] == NULL) {
+                if (tarefas[j] == NULL && tarefas[j + 1] != NULL) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
+                if (tarefas[j + 1] == NULL) continue;
+
+                if (tarefas[j]->prioridade < tarefas[j + 1]->prioridade) {
                     tarefa *temporario = tarefas[j];
                     tarefas[j] = tarefas[j + 1];
                     tarefas[j + 1] = temporario;
@@ -181,6 +199,7 @@ bool ordernar_por_prioridade(bool decrescente) {
         if (trocado == false)
             break;
     }
+    return true;
 }
 
 bool ordernar_por_data(bool decrescente) {
@@ -189,14 +208,32 @@ bool ordernar_por_data(bool decrescente) {
         trocado = false;
         for (int j = 0; j < MAX_TAREFAS - i - 1; j++) {
             if (!decrescente) {
-                if (data_maior_que(&tarefas[j]->data_limite, &tarefas[j + 1]->data_limite) || tarefas[j] == NULL) {
+                if (tarefas[j] == NULL && tarefas[j + 1] != NULL) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
+                if (tarefas[j + 1] == NULL) continue;
+
+                if (data_maior_que(&tarefas[j]->data_limite, &tarefas[j + 1]->data_limite)) {
                     tarefa *temporario = tarefas[j];
                     tarefas[j] = tarefas[j + 1];
                     tarefas[j + 1] = temporario;
                     trocado = true;
                 }
             } else {
-                if (data_menor_que(&tarefas[j]->data_limite, &tarefas[j + 1]->data_limite) || tarefas[j] == NULL) {
+                if (tarefas[j] == NULL && tarefas[j + 1] != NULL) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
+                if (tarefas[j + 1] == NULL) continue;
+
+                if (data_menor_que(&tarefas[j]->data_limite, &tarefas[j + 1]->data_limite)) {
                     tarefa *temporario = tarefas[j];
                     tarefas[j] = tarefas[j + 1];
                     tarefas[j + 1] = temporario;
@@ -208,4 +245,5 @@ bool ordernar_por_data(bool decrescente) {
         if (trocado == false)
             break;
     }
+    return true;
 }

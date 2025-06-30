@@ -2,6 +2,9 @@
 #include <time.h>
 
 #include "app.h"
+
+#include <iso646.h>
+
 #include "tarefa.h"
 #include "categoria.h"
 #include "utilidades.h"
@@ -14,9 +17,11 @@
 #define ALTERAR_CATEGORIA 6
 #define ADICIONAR_CATEGORIA 7
 #define LISTAR_CONCLUIDAS 8
+#define ORDERNAR 9
 #define SAIR 0
 
 int id_categoria_selecionada = -1;
+int tipo_ordem = ORDENADO_DATA_CRES;
 
 int main(void) {
     inicializar_categorias();
@@ -64,7 +69,13 @@ int main(void) {
             case LISTAR_CONCLUIDAS:
                 clrscr();
                 m_ver_tarefas_concluidas();
+                break;
+            case ORDERNAR:
+                clrscr();
+                m_ordernar();
+                break;
             default:
+                m_salvar_e_sair();
                 printf("Salvando...");
                 break;
         }
@@ -86,6 +97,7 @@ void m_mostrar_menu() {
     printf("6 - Mudar categoria\n");
     printf("7 - Adicionar categoria\n");
     printf("8 - Ver tarefas feitas\n");
+    printf("9 - Ordernar tarefas\n");
     printf("0 - Sair\n\n");
 }
 
@@ -131,6 +143,7 @@ void m_mostrar_tarefas() {
         printf("Todas as tarefas:\n");
     }
 
+    bool tem_tarefas = false;
     int tarefas_completadas = 0;
     for (int i = 0; i < MAX_TAREFAS; i++) {
         if (tarefas[i] == NULL) continue;
@@ -147,6 +160,8 @@ void m_mostrar_tarefas() {
             }
         }
 
+        tem_tarefas = true;
+
         struct tm *data = &tarefa->data_limite;
 
         printf("  %d. [P%d] ", i + 1, tarefa->prioridade);
@@ -162,6 +177,12 @@ void m_mostrar_tarefas() {
         printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
         printf("\n");
     }
+    if (!tem_tarefas) {
+        printf("\nNão há tarefas disponíveis.\n\n");
+        esperar_para_continuar();
+        return;
+    }
+
     printf("\n");
     printf("Completadas: %d", tarefas_completadas);
 
@@ -253,6 +274,7 @@ void m_remover_tarefa() {
 
     printf("\nQual tarefa gostaria de remover?\n\n");
 
+    bool tem_tarefas = false;
     for (int i = 0; i < MAX_TAREFAS; i++) {
         if (tarefas[i] == NULL) continue;
 
@@ -263,6 +285,8 @@ void m_remover_tarefa() {
                 continue;
             }
         }
+
+        tem_tarefas = true;
 
         struct tm *data = &tarefa->data_limite;
 
@@ -278,6 +302,12 @@ void m_remover_tarefa() {
         printf(" (ID %d)", tarefa->id);
         printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
         printf("\n");
+    }
+
+    if (!tem_tarefas) {
+        printf("\nNão há tarefas para remover.\n\n");
+        esperar_para_continuar();
+        return;
     }
 
     printf("\nInforme o ID da tarefa: ");
@@ -594,7 +624,6 @@ void m_ver_tarefas_concluidas() {
         if (tarefas[i] == NULL) continue;
         if (tarefas[i]->status == 0) continue;
 
-        tem_tarefas = true;
 
         tarefa *tarefa = tarefas[i];
 
@@ -603,6 +632,8 @@ void m_ver_tarefas_concluidas() {
                 continue;
             }
         }
+
+        tem_tarefas = true;
 
         struct tm *data = &tarefa->data_limite;
 
@@ -621,7 +652,7 @@ void m_ver_tarefas_concluidas() {
     }
 
     if (!tem_tarefas) {
-        printf("Não há tarefas completadas.\n\n");
+        printf("\nNão há tarefas completadas.\n\n");
         esperar_para_continuar();
         return;
     }
@@ -658,8 +689,85 @@ void m_ver_tarefas_concluidas() {
     esperar_para_continuar();
 }
 
-void salvar_e_sair() {
+void m_ordernar() {
+    printf("===============================\n");
+    printf("           ORDERNAR            \n");
+    printf("===============================\n\n");
+
+    categoria *categoria_selecionada = selecionar_categoria(id_categoria_selecionada);
+
+    printf("Categoria selecionada: ");
+    puts(categoria_selecionada == NULL ? "Todas" : categoria_selecionada->descricao);
+
+    // Setar frase para indicar o tipo de ordenação atual
+    char *ordenacao_atual = _obter_frase_ordenacao_atual();
+
+    printf("Ordenação atual: ");
+    puts(ordenacao_atual);
+    printf("\n");
+
+    int escolha;
+    printf("Escolha o metódo de ordenação: \n\n");
+    printf("POR DATA:\n");
+    printf(" 1. Data - Crescente\n");
+    printf(" 2. Data - Decrescente\n\n");
+    printf("POR PRIORIDADE:\n");
+    printf(" 3. Prioridade- Crescente\n");
+    printf(" 4. Prioridade- Decrescente\n\n");
+
+    printf("Informe sua escolha (1-4): ");
+    scanf("%d", &escolha);
+    limpar_buffer_entrada();
+
+    if (escolha < 1 || escolha > 4) {
+        printf("\nEscolha inválida!");
+        esperar_para_continuar();
+        return;
+    }
+
+    printf("\n");
+
+    tipo_ordem = escolha;
+    ordenacao_atual = _obter_frase_ordenacao_atual();
+    _ordernar_baseado_no_tipo_selecionado();
+
+    printf("Ordenação nova: ");
+    puts(ordenacao_atual);
+
+
+    printf("\n\n");
+
+    esperar_para_continuar();
 }
 
-void m_ordernar() {
+void m_alterar_prazo() {
+
+}
+
+void m_salvar_e_sair() {
+}
+
+char *_obter_frase_ordenacao_atual() {
+    char *ordenacao_atual = 0;
+    if (tipo_ordem == ORDENADO_DATA_CRES) ordenacao_atual = "Data (Crescente)";
+    if (tipo_ordem == ORDENADO_DATA_DECRES) ordenacao_atual = "Data (Decrescente)";
+    if (tipo_ordem == ORDENADO_PRIORIDADE_CRES) ordenacao_atual = "Prioridade (Crescente)";
+    if (tipo_ordem == ORDENADO_PRIORIDADE_DECRES) ordenacao_atual = "Prioridade (Crescente)";
+
+    return ordenacao_atual;
+}
+
+void _ordernar_baseado_no_tipo_selecionado() {
+    if (tipo_ordem == ORDENADO_DATA_CRES) {
+        ordernar_por_data(false);
+    }
+    if (tipo_ordem == ORDENADO_DATA_DECRES) {
+        ordernar_por_data(true);
+    }
+    if (tipo_ordem == ORDENADO_PRIORIDADE_CRES) {
+        ordernar_por_prioridade(false);
+    }
+    if (tipo_ordem == ORDENADO_PRIORIDADE_DECRES) {
+        ordernar_por_prioridade(true);
+    }
 }

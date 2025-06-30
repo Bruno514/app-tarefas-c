@@ -116,17 +116,17 @@ void esperar_para_continuar() {
 }
 
 bool data_maior_que(struct tm *data1, struct tm *data2) {
-    if (data1->tm_year != data2->tm_year) return data2->tm_year > data2->tm_year;
-    if (data1->tm_mon != data2->tm_mon) return data2->tm_mon > data2->tm_mon;
-    if (data1->tm_mday != data2->tm_mday) return data2->tm_mday > data2->tm_mday;
+    if (data1->tm_year != data2->tm_year) return data1->tm_year > data2->tm_year;
+    if (data1->tm_mon != data2->tm_mon) return data1->tm_mon > data2->tm_mon;
+    if (data1->tm_mday != data2->tm_mday) return data1->tm_mday > data2->tm_mday;
 
     return false;
 }
 
 bool data_menor_que(struct tm *data1, struct tm *data2) {
-    if (data1->tm_year != data2->tm_year) return data2->tm_year < data2->tm_year;
-    if (data1->tm_mon != data2->tm_mon) return data2->tm_mon < data2->tm_mon;
-    if (data1->tm_mday != data2->tm_mday) return data2->tm_mday < data2->tm_mday;
+    if (data1->tm_year != data2->tm_year) return data1->tm_year < data2->tm_year;
+    if (data1->tm_mon != data2->tm_mon) return data1->tm_mon < data2->tm_mon;
+    if (data1->tm_mday != data2->tm_mday) return data1->tm_mday < data2->tm_mday;
 
     return false;
 }
