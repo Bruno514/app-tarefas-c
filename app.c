@@ -4,6 +4,7 @@
 #include "app.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "tarefa.h"
 #include "categoria.h"
@@ -18,14 +19,17 @@
 #define ADICIONAR_CATEGORIA 7
 #define LISTAR_CONCLUIDAS 8
 #define ORDERNAR 9
+#define ALTERAR_PRAZO 10
+#define BUSCAR_TAREFA 11
 #define SAIR 0
 
 int id_categoria_selecionada = -1;
-int tipo_ordem = ORDENADO_DATA_CRES;
+int tipo_ordem = ORDENADO_DATA_DECRES;
 
 int main(void) {
     inicializar_categorias();
     inicializar_tarefas();
+    _ordernar_baseado_no_tipo_selecionado();
 
     int opcao = -1;
 
@@ -72,7 +76,15 @@ int main(void) {
                 break;
             case ORDERNAR:
                 clrscr();
-                m_ordernar();
+                m_ordenar();
+                break;
+            case ALTERAR_PRAZO:
+                clrscr();
+                m_alterar_prazo();
+                break;
+            case BUSCAR_TAREFA:
+                clrscr();
+                m_buscar_por_palavra_chave();
                 break;
             default:
                 m_salvar_e_sair();
@@ -98,6 +110,8 @@ void m_mostrar_menu() {
     printf("7 - Adicionar categoria\n");
     printf("8 - Ver tarefas feitas\n");
     printf("9 - Ordernar tarefas\n");
+    printf("10 - Alterar prazo\n");
+    printf("11 - Buscar tarefa\n");
     printf("0 - Sair\n\n");
 }
 
@@ -107,7 +121,6 @@ void m_mostrar_tarefas() {
     printf("===============================\n\n");
     printf("Categorias:\n");
     categoria *categoria_selecionada = selecionar_categoria(id_categoria_selecionada);
-    m_notificar();
 
     for (int i = 0; i < MAX_CATEGORIAS; i++) {
         if (categorias[i] == NULL) {
@@ -170,7 +183,7 @@ void m_mostrar_tarefas() {
 
         struct tm *data = &tarefa->data_limite;
 
-        printf("  %d. [P%d] ", i + 1, tarefa->prioridade);
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
         if (categoria_selecionada == NULL) {
             if (tarefa->categoria != NULL) {
                 printf("[");
@@ -179,8 +192,9 @@ void m_mostrar_tarefas() {
             }
         }
         fputs(tarefa->descricao, stdout);
-        printf(" (ID %d)", tarefa->id);
-        printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        if (tarefa->data_limite.tm_year != -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
         printf("\n");
     }
     if (!tem_tarefas) {
@@ -219,7 +233,7 @@ void m_adicionar_tarefa() {
     printf("Informe a data limite da tarefa (aaaa/mm/dd): ");
     ler_string(data_limite, 11);
 
-    while (!validar_data(data_limite)) {
+    while (!validar_data(data_limite) && strlen(data_limite) > 0) {
         printf("\nData inválida\n");
         printf("Informe a data limite da tarefa (aaaa/mm/dd): ");
         ler_string(data_limite, 11);
@@ -257,8 +271,10 @@ void m_adicionar_tarefa() {
         }
         fputs(tarefa->descricao, stdout);
         printf(" (ID %d)", tarefa->prioridade);
-        printf(" - %d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
-               tarefa->data_limite.tm_mday);
+        if (tarefa->data_limite.tm_year != -1) {
+            printf(" - %d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
+                   tarefa->data_limite.tm_mday);
+        }
         printf("\n");
     } else {
         printf("\nNão foi possivel adicionar a tarefa!\n\n");
@@ -296,7 +312,7 @@ void m_remover_tarefa() {
 
         struct tm *data = &tarefa->data_limite;
 
-        printf("  %d. [P%d] ", i + 1, tarefa->prioridade);
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
         if (categoria_selecionada == NULL) {
             if (tarefa->categoria != NULL) {
                 printf("[");
@@ -305,8 +321,9 @@ void m_remover_tarefa() {
             }
         }
         fputs(tarefa->descricao, stdout);
-        printf(" (ID %d)", tarefa->id);
-        printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        if (data->tm_year != -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
         printf("\n");
     }
 
@@ -366,7 +383,7 @@ void m_marcar_como_concluida() {
 
         struct tm *data = &tarefa->data_limite;
 
-        printf("  %d. [P%d] ", i + 1, tarefa->prioridade);
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
         if (categoria_selecionada == NULL) {
             if (tarefa->categoria != NULL) {
                 printf("[");
@@ -375,8 +392,9 @@ void m_marcar_como_concluida() {
             }
         }
         fputs(tarefa->descricao, stdout);
-        printf(" (ID %d)", tarefa->id);
-        printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        if (data->tm_year != -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
         printf("\n");
     }
 
@@ -406,8 +424,10 @@ void m_marcar_como_concluida() {
     }
     fputs(tarefa->descricao, stdout);
     printf(" (ID %d)", tarefa->id);
-    printf(" - %d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
-           tarefa->data_limite.tm_mday);
+    if (tarefa->data_limite.tm_year != -1) {
+        printf(" - %d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
+               tarefa->data_limite.tm_mday);
+    }
     printf("\n\n");
 
     esperar_para_continuar();
@@ -440,7 +460,7 @@ void m_alterar_prioridade() {
 
         struct tm *data = &tarefa->data_limite;
 
-        printf("  %d. [P%d] ", i + 1, tarefa->prioridade);
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
         if (categoria_selecionada == NULL) {
             if (tarefa->categoria != NULL) {
                 printf("[");
@@ -449,8 +469,9 @@ void m_alterar_prioridade() {
             }
         }
         fputs(tarefa->descricao, stdout);
-        printf(" (ID %d)", tarefa->id);
-        printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        if (data->tm_year == -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
         printf("\n");
     }
 
@@ -477,8 +498,10 @@ void m_alterar_prioridade() {
     }
     fputs(tarefa->descricao, stdout);
     printf(" (ID %d)", tarefa->id);
-    printf(" - %d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
-           tarefa->data_limite.tm_mday);
+    if (tarefa->data_limite.tm_year != -1) {
+        printf(" - %d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
+               tarefa->data_limite.tm_mday);
+    }
     printf("\n\n");
 
     int prioridade;
@@ -514,6 +537,7 @@ void m_mudar_categoria() {
     printf("===============================\n\n");
     printf("Categorias disponíveis:\n\n");
 
+    printf("ID 0 - Todas\n");
     for (int i = 0; i < MAX_CATEGORIAS; i++) {
         if (categorias[i] == NULL) {
             continue;
@@ -542,6 +566,13 @@ void m_mudar_categoria() {
     printf("\nInforme o ID da categoria: ");
     scanf("%d", &id);
     limpar_buffer_entrada();
+
+    if (id == 0) {
+        printf("\nMudou para categoria: Todas\n");
+        id_categoria_selecionada = -1;
+        esperar_para_continuar();
+        return;
+    }
 
     categoria *categoria = selecionar_categoria(id);
 
@@ -643,7 +674,7 @@ void m_ver_tarefas_concluidas() {
 
         struct tm *data = &tarefa->data_limite;
 
-        printf("  %d. [P%d] ", i + 1, tarefa->prioridade);
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
         if (categoria_selecionada == NULL) {
             if (tarefa->categoria != NULL) {
                 printf("[");
@@ -652,8 +683,10 @@ void m_ver_tarefas_concluidas() {
             }
         }
         fputs(tarefa->descricao, stdout);
-        printf("OK (ID %d)", tarefa->id);
-        printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        printf("OK)", tarefa->id);
+        if (data->tm_year != -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
         printf("\n");
     }
 
@@ -695,7 +728,7 @@ void m_ver_tarefas_concluidas() {
     esperar_para_continuar();
 }
 
-void m_ordernar() {
+void m_ordenar() {
     printf("===============================\n");
     printf("           ORDERNAR            \n");
     printf("===============================\n\n");
@@ -747,68 +780,134 @@ void m_ordernar() {
 }
 
 void m_alterar_prazo() {
+    int id = 0;
+    printf("===============================\n");
+    printf("           ALTERAR PRAZO       \n");
+    printf("===============================\n\n");
+    categoria *categoria_selecionada = selecionar_categoria(id_categoria_selecionada);
+
+    printf("Categoria selecionada: ");
+    puts(categoria_selecionada == NULL ? "Todas" : categoria_selecionada->descricao);
+
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) continue;
+        if (tarefas[i]->status == 1) continue;
+
+        tarefa *tarefa = tarefas[i];
+
+        if (categoria_selecionada != NULL) {
+            if (tarefa->categoria != categoria_selecionada) {
+                continue;
+            }
+        }
+
+        struct tm *data = &tarefa->data_limite;
+
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
+        if (categoria_selecionada == NULL) {
+            if (tarefa->categoria != NULL) {
+                printf("[");
+                fputs(tarefa->categoria->descricao, stdout);
+                printf("] ");
+            }
+        }
+        fputs(tarefa->descricao, stdout);
+        if (data->tm_year != -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    printf("Informe o ID da tarefa: ");
+    scanf("%d", &id);
+    limpar_buffer_entrada();
+    printf("\n\n");
+
+    char data_limite[11];
+    printf("Informe o novo prazo:\n");
+    printf("> ");
+    ler_string(data_limite, 11);
+
+    while (!validar_data(data_limite) && strlen(data_limite) > 0) {
+        printf("\nData inválida\n");
+        printf("Informe a data limite da tarefa (aaaa/mm/dd): ");
+        ler_string(data_limite, 11);
+    }
+
+    printf("\n\n");
+
+    tarefa *tarefa = buscar_tarefa_id(id);
+    if (alterar_prazo(tarefa, data_limite)) {
+        printf("Data alterada com sucesso!\n");
+    } else {
+        printf("Não foi possivel alterar prazo!\n");
+    }
+
+    printf("\n");
+
+    _ordernar_baseado_no_tipo_selecionado();
+
+    esperar_para_continuar();
+}
+
+void m_buscar_por_palavra_chave() {
+    printf("===============================\n");
+    printf("           BUSCAR TAREFA       \n");
+    printf("===============================\n\n");
+    categoria *categoria_selecionada = selecionar_categoria(id_categoria_selecionada);
+
+    printf("Categoria selecionada: ");
+    puts(categoria_selecionada == NULL ? "Todas" : categoria_selecionada->descricao);
+
+    char palavra_chave[41];
+    printf("\n\nInforme sua busca: ");
+    ler_string(palavra_chave, 41);
+
+    bool tem_tarefas = false;
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) continue;
+        if (tarefas[i]->status == 1) continue;
+
+        tarefa *tarefa = tarefas[i];
+
+        if (categoria_selecionada != NULL) {
+            if (tarefa->categoria != categoria_selecionada) {
+                continue;
+            }
+        }
+
+        if (!strstr(tarefa->descricao, palavra_chave)) {
+            continue;
+        }
+
+        tem_tarefas = true;
+
+        struct tm *data = &tarefa->data_limite;
+
+        printf(" (ID %d). [P%d] ", tarefa->id, tarefa->prioridade);
+        if (categoria_selecionada == NULL) {
+            if (tarefa->categoria != NULL) {
+                printf("[");
+                fputs(tarefa->categoria->descricao, stdout);
+                printf("] ");
+            }
+        }
+        fputs(tarefa->descricao, stdout);
+        if (data->tm_year != -1) {
+            printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
+        }
+        printf("\n");
+    }
+
+    if (!tem_tarefas) {
+        printf("Nenhuma tarefa encontrada!\n\n");
+    }
+
+    esperar_para_continuar();
 }
 
 void m_salvar_e_sair() {
-}
-
-void m_notificar() {
-    int quantidade_notificacoes = 0;
-
-    for (int i = 0; i < MAX_TAREFAS; i++) {
-        if (tarefas[i] == NULL) continue;
-        if (tarefas[i]->status == 1) continue;
-
-        tarefa *tarefa = tarefas[i];
-        // struct tm data = tarefa->data_limite;
-
-        time_t rawtime;
-        time(&rawtime);
-        struct tm * tm_now = localtime(&rawtime);
-
-        // Tarefas atrasadas ou 2 dias faltando para o prazo contam como notificadas
-        if (tm_now->tm_year == tarefa->data_limite.tm_year && tm_now->tm_mon == tarefa->data_limite.tm_mon) {
-            if (tm_now->tm_mday - tarefa->data_limite.tm_mday < 2) {
-                quantidade_notificacoes++;
-            }
-        }
-    }
-
-    printf("NOTIFICAÇÕES (%d):\n", quantidade_notificacoes);
-
-    for (int i = 0; i < MAX_TAREFAS; i++) {
-        if (tarefas[i] == NULL) continue;
-        if (tarefas[i]->status == 1) continue;
-
-        tarefa *tarefa = tarefas[i];
-        struct tm *data = &tarefa->data_limite;
-
-        time_t t = time(NULL);
-        struct tm time = *localtime(&t);
-
-        // Tarefas atrasadas ou 2 dias faltando para o prazo contam como notificadas
-        if (time.tm_year == data->tm_year && time.tm_mon == data->tm_mon) {
-            if (time.tm_mday - data->tm_mday < 2) {
-                int dias_atraso = time.tm_mday - data->tm_mday;
-
-                printf("  [P%d] ", tarefa->prioridade);
-                if (tarefa->categoria != NULL) {
-                    printf("[");
-                    fputs(tarefa->categoria->descricao, stdout);
-                    printf("] ");
-                }
-                fputs(tarefa->descricao, stdout);
-                printf(" (ID %d)", tarefa->id);
-                printf(" - %d/%02d/%02d", data->tm_year + 1900, data->tm_mon + 1, data->tm_mday);
-                if (dias_atraso > 0) {
-                    // printf(" | Atrasado %d dias\n", abs(dias_atraso));
-                } else {
-                    printf(" | Faltam %d dias\n", dias_atraso);
-                }
-            }
-        }
-    }
-    printf("\n");
 }
 
 char *_obter_frase_ordenacao_atual() {

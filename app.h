@@ -30,13 +30,13 @@ void m_adicionar_categoria();
 
 void m_ver_tarefas_concluidas();
 
-void m_ordernar();
+void m_ordenar();
 
 void m_alterar_prazo();
 
-void m_salvar_e_sair();
+void m_buscar_por_palavra_chave();
 
-void m_notificar();
+void m_salvar_e_sair();
 
 // Retorna frase baseado no Int do tipo de ordem
 char *_obter_frase_ordenacao_atual();

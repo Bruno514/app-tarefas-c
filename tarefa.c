@@ -68,7 +68,12 @@ tarefa *criar_tarefa(int id, char *descricao, char *data_limite, int status, int
     // ID pode ser informado ou não (nesse caso um id será dado automaticamente)
     tarefa->id = id == -1 ? ++t_ultimo_id : id;
     strcpy(tarefa->descricao, descricao);
-    str_data_para_tm(data_limite, &tarefa->data_limite);
+    if (strlen(data_limite) == 0 || strcmp(data_limite, " ") == 0) {
+        tarefa->data_limite.tm_year = -1;
+    } else {
+        str_data_para_tm(data_limite, &tarefa->data_limite);
+    }
+
     tarefa->status = status;
     tarefa->prioridade = prioridade;
     tarefa->categoria = categoria;
@@ -93,6 +98,11 @@ bool adicionar_tarefa(tarefa *tarefa) {
 }
 
 bool alterar_prazo(tarefa *tarefa, char data_limite[11]) {
+    if (strlen(data_limite) == 0 || strcmp(data_limite, " ") == 0) {
+        tarefa->data_limite.tm_year = -1;
+        return true;
+    }
+
     if (!str_data_para_tm(data_limite, &tarefa->data_limite)) {
         return false;
     }
@@ -171,6 +181,13 @@ bool ordernar_por_prioridade(bool decrescente) {
                 }
                 if (tarefas[j + 1] == NULL) continue;
 
+                if (tarefas[j]->data_limite.tm_year == -1 && tarefas[j + 1]->data_limite.tm_year != -1) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
                 if (tarefas[j]->prioridade > tarefas[j + 1]->prioridade) {
                     tarefa *temporario = tarefas[j];
                     tarefas[j] = tarefas[j + 1];
@@ -186,6 +203,14 @@ bool ordernar_por_prioridade(bool decrescente) {
                     continue;
                 }
                 if (tarefas[j + 1] == NULL) continue;
+
+                if (tarefas[j]->data_limite.tm_year == -1 && tarefas[j + 1]->data_limite.tm_year != -1) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
 
                 if (tarefas[j]->prioridade < tarefas[j + 1]->prioridade) {
                     tarefa *temporario = tarefas[j];
@@ -204,10 +229,14 @@ bool ordernar_por_prioridade(bool decrescente) {
 
 bool ordernar_por_data(bool decrescente) {
     bool trocado;
-    for (int i = 0; i < MAX_TAREFAS - 1; i++) {
+    int n = sizeof(tarefas) / sizeof(tarefas[0]);
+
+    for (int i = 0; i < n - 1; i++) {
         trocado = false;
-        for (int j = 0; j < MAX_TAREFAS - i - 1; j++) {
+        for (int j = 0; j < n - i - 1; j++) {
             if (!decrescente) {
+                if (tarefas[j + 1] == NULL) continue;
+
                 if (tarefas[j] == NULL && tarefas[j + 1] != NULL) {
                     tarefa *temporario = tarefas[j];
                     tarefas[j] = tarefas[j + 1];
@@ -215,7 +244,16 @@ bool ordernar_por_data(bool decrescente) {
                     trocado = true;
                     continue;
                 }
-                if (tarefas[j + 1] == NULL) continue;
+                if (tarefas[j]->data_limite.tm_year != -1 && tarefas[j + 1]->data_limite.tm_year == -1) continue;
+
+                if (tarefas[j]->data_limite.tm_year == -1 && tarefas[j + 1]->data_limite.tm_year != -1) {
+                    printf("HELLO");
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
 
                 if (data_maior_que(&tarefas[j]->data_limite, &tarefas[j + 1]->data_limite)) {
                     tarefa *temporario = tarefas[j];
@@ -232,6 +270,16 @@ bool ordernar_por_data(bool decrescente) {
                     continue;
                 }
                 if (tarefas[j + 1] == NULL) continue;
+
+                if (tarefas[j]->data_limite.tm_year != -1 && tarefas[j + 1]->data_limite.tm_year == -1) continue;
+
+                if (tarefas[j]->data_limite.tm_year == -1 && tarefas[j + 1]->data_limite.tm_year != -1) {
+                    tarefa *temporario = tarefas[j];
+                    tarefas[j] = tarefas[j + 1];
+                    tarefas[j + 1] = temporario;
+                    trocado = true;
+                    continue;
+                }
 
                 if (data_menor_que(&tarefas[j]->data_limite, &tarefas[j + 1]->data_limite)) {
                     tarefa *temporario = tarefas[j];
