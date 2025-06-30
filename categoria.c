@@ -14,8 +14,8 @@ categoria *categorias[MAX_CATEGORIAS];
 
 int c_ultimo_id = 0;
 
-bool inicializar_categorias() {
-    FILE *stream = fopen("/home/bruno/categorias.csv", "a+");
+void inicializar_categorias() {
+    FILE *stream = fopen("categorias.csv", "a+");
 
     char linha[256];
     int id = 0;
@@ -28,7 +28,7 @@ bool inicializar_categorias() {
         }
 
         strcpy(descricao, strtok(NULL, ","));
-        descricao[strlen(descricao)-1] = '\0';
+        descricao[strlen(descricao) - 1] = '\0';
         strtok(NULL, ",");
 
         categoria *categoria = criar_categoria(id, descricao);
@@ -41,8 +41,19 @@ bool inicializar_categorias() {
     }
 
     fclose(stream);
+}
 
-    return true;
+void salvar_categorias() {
+    FILE *stream = fopen("categorias.csv", "w");
+
+    for (int i = 0; i < MAX_CATEGORIAS; i++) {
+        if (categorias[i] == NULL) continue;
+        categoria *categoria = categorias[i];
+
+        fprintf(stream, "%d,%s\n", categoria->id, categoria->descricao);
+    }
+
+    fclose(stream);
 }
 
 categoria* criar_categoria(int id, char *descricao) {

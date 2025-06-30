@@ -20,9 +20,9 @@ extern int c_ultimo_id;
 
 // categorizar tarefas (trabalho, escola, saúde, casa, lazer, mercado), opção de adiconar/remover uma categoria, avisar 2 dias em antes ao rodar o programa, persistencia em arquivos
 
-bool inicializar_categorias();
+void inicializar_categorias();
 
-bool salvar_categorias();
+void salvar_categorias();
 
 categoria* criar_categoria(int id, char *descricao);
 

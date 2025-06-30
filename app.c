@@ -87,6 +87,7 @@ int main(void) {
                 m_buscar_por_palavra_chave();
                 break;
             default:
+                clrscr();
                 m_salvar_e_sair();
                 printf("Salvando...");
                 break;
@@ -908,6 +909,39 @@ void m_buscar_por_palavra_chave() {
 }
 
 void m_salvar_e_sair() {
+    printf("===============================\n");
+    printf("       SALVANDO E SAINDO       \n");
+    printf("===============================\n\n");
+    salvar_categorias();
+    salvar_tarefas();
+    printf("Sumário:\n");
+    for (int i = 0; i < MAX_CATEGORIAS; i++) {
+        if (categorias[i] == NULL) {
+            continue;
+        }
+
+        categoria *categoria = categorias[i];
+        printf("[");
+        fputs(categoria->descricao, stdout);
+        printf("] ");
+
+        int tarefas_por_categoria = 0;
+
+        for (int j = 0; j < MAX_TAREFAS; j++) {
+            if (tarefas[j] == NULL) {
+                continue;
+            }
+
+            if (tarefas[j]->categoria == categoria) {
+                tarefas_por_categoria++;
+            }
+        }
+
+        printf("(%d tarefas)\n", tarefas_por_categoria);
+    }
+
+    printf("\nAté mais!\n");
+    printf("Obrigado!\n");
 }
 
 char *_obter_frase_ordenacao_atual() {

@@ -20,7 +20,7 @@ tarefa *tarefas[MAX_TAREFAS];
 int t_ultimo_id = 0;
 
 void inicializar_tarefas() {
-    FILE *stream = fopen("/home/bruno/tarefas.csv", "a+");
+    FILE *stream = fopen("tarefas.csv", "a+");
 
     char linha[256];
     char descricao[MAX_T_DESCRICAO];
@@ -60,6 +60,24 @@ void inicializar_tarefas() {
 }
 
 void salvar_tarefas() {
+    FILE *stream = fopen("tarefas.csv", "w");
+
+    for (int i = 0; i < MAX_TAREFAS; i++) {
+        if (tarefas[i] == NULL) continue;
+        tarefa *tarefa = tarefas[i];
+        char data[21] = {0};
+
+        if (tarefa->data_limite.tm_year != -1) {
+            snprintf(data, sizeof(data), "%d/%02d/%02d", tarefa->data_limite.tm_year + 1900, tarefa->data_limite.tm_mon + 1,
+                    tarefa->data_limite.tm_mday);
+        } else {
+            strcpy(data, " ");
+        }
+
+        fprintf(stream, "%d,%s,%s,%d,%d,%d\n", tarefa->id, tarefa->descricao, data, tarefa->prioridade, tarefa->status,
+                tarefa->categoria == NULL ? -1 : tarefa->categoria->id);
+    }
+    fclose(stream);
 }
 
 tarefa *criar_tarefa(int id, char *descricao, char *data_limite, int status, int prioridade, categoria *categoria) {
@@ -69,6 +87,7 @@ tarefa *criar_tarefa(int id, char *descricao, char *data_limite, int status, int
     tarefa->id = id == -1 ? ++t_ultimo_id : id;
     strcpy(tarefa->descricao, descricao);
     if (strlen(data_limite) == 0 || strcmp(data_limite, " ") == 0) {
+        memset(&tarefa->data_limite, 0, sizeof(tarefa->data_limite));
         tarefa->data_limite.tm_year = -1;
     } else {
         str_data_para_tm(data_limite, &tarefa->data_limite);
