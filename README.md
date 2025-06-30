@@ -12,8 +12,7 @@ Este projeto implementa um sistema de gerenciamento de tarefas pessoais, permiti
 - Status de conclusão  
 - Busca por palavra-chave
 - Ordenar por prioridade e data
-- Notificações
-- Alerta de reagendamento  
+- Reagendamentos  
 
 ## Estrutura de Dados
 
